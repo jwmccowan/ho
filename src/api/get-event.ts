@@ -4,7 +4,7 @@ import HoEvent from "./interfaces/ho-event.interface";
 export default async function getEvent(id: string): Promise<HoEvent | null> {
   let { error, data } = await supabase
     .from("events")
-    .select("*")
+    .select()
     .eq("events.id", id)
     .single();
 
