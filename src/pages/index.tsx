@@ -20,7 +20,6 @@ const Home: NextPage = () => {
         new Date(),
         "This describes a fun event"
       );
-      console.log("eggs", data);
     } catch (e) {
       console.error(e);
     } finally {
@@ -31,7 +30,6 @@ const Home: NextPage = () => {
     try {
       setLoading(true);
       const data = await getEvents();
-      console.log("eggs", data);
     } catch (e) {
       console.error(e);
     } finally {

@@ -31,7 +31,7 @@ export default function LoginPage(): JSX.Element {
     mode: "onBlur",
     reValidateMode: "onBlur",
   });
-  console.log("eggs", errors);
+
   return (
     <>
       <Head>

@@ -26,7 +26,5 @@ export default async function createEvent(
     throw new Error("No data was returned");
   }
 
-  console.log("eggs", data);
-
   return data as unknown as HoEvent;
 }
