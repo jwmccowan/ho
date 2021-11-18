@@ -9,7 +9,8 @@ import { supabase } from "../utils/supabase.client";
 import useAuth from "../hooks/use-auth";
 import Container from "../components/atoms/Container";
 import useCreateWishlist from "../hooks/use-create-wishlist";
-import useGetWishlists from "../hooks/use-get-wishlists";
+import useSWR from "swr";
+import Wishlist from "../api/interfaces/wishlist.interface";
 
 interface Profile {
   username?: string;
@@ -135,13 +136,24 @@ function ProfileForm(props: ProfileFormProps): JSX.Element {
   );
 }
 
+async function getWishlists() {
+  const { data: wishlists, error } = await supabase.from("wishlist");
+  if (error) {
+    throw error;
+  }
+  return wishlists as Wishlist[];
+}
+
 export default function Profile() {
   const user = useAuth();
   const [profile, updateProfile, loading] = useProfile();
   const [createWishlist, wishlistLoading] = useCreateWishlist();
-  const [wishlists, wishlistsLoading] = useGetWishlists();
+  const { data: wishlists, isValidating: wishlistsLoading } = useSWR(
+    "all_wishlists",
+    getWishlists
+  );
 
-  const session = useSession();
+  useAuth();
 
   if (!user) {
     return <div>Uh oh!</div>;
@@ -173,7 +185,7 @@ export default function Profile() {
             </Button>
             {wishlistsLoading && <p>Loading...</p>}
             <ul>
-              {wishlists.map((list) => (
+              {(wishlists ?? []).map((list) => (
                 <li key={list.id}>
                   <h3 className="text-xl">{list.title}</h3>
                   <p className="text-gray-600">{list.description}</p>

@@ -2,12 +2,14 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
+import useSWR from "swr";
 import createEvent from "../api/create-event";
-import getEvents from "../api/get-events";
+import HoEvent from "../api/interfaces/ho-event.interface";
 import Button from "../components/atoms/Button";
 import Container from "../components/atoms/Container";
 import Layout from "../components/layouts/Layout";
 import EventList from "../components/molecules/EventList";
+import { supabase } from "../utils/supabase.client";
 
 const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
@@ -26,16 +28,7 @@ const Home: NextPage = () => {
       setLoading(false);
     }
   };
-  const handleGetClick = async () => {
-    try {
-      setLoading(true);
-      const data = await getEvents();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+
   return (
     <>
       <Head>
@@ -55,9 +48,6 @@ const Home: NextPage = () => {
             <h2 className="text-2xl mb-8 text-red-900">Your upcoming events</h2>
             <Button onClick={handleCreateClick}>
               {loading ? "Loading..." : "Create Event"}
-            </Button>
-            <Button onClick={handleGetClick}>
-              {loading ? "Loading..." : "Get Event"}
             </Button>
             <EventList />
           </Container>
