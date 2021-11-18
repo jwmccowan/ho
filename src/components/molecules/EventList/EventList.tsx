@@ -25,13 +25,13 @@ export default function EventList(props: EventListProps): JSX.Element {
 
   return (
     <div className="relative">
-      <ul className="flex flex-row full-width overflow-x-auto" ref={ref}>
+      <ul className="flex flex-row w-full overflow-x-auto" ref={ref}>
         {(events ?? []).map((event) => (
           <li className="bg-white mr-4 rounded-xl" key={event.id}>
             <Link href={`/events/${event.id}`} passHref>
               <a className="p-12 block">
                 <div>
-                  <h2 className="text-2xl">{event.title}</h2>
+                  <h2 className="text-2xl whitespace-nowrap">{event.title}</h2>
                   <p className="text-gray-600">{event.description}</p>
                 </div>
               </a>

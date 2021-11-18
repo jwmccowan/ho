@@ -27,7 +27,7 @@ function LogoutButton(): JSX.Element {
 function TopNav() {
   const session = useSession();
   return (
-    <nav className="w-full py-4">
+    <nav className="py-4">
       <Container>
         <div className="flex flex-row items-center">
           <ul className="flex flex-row items-center">
@@ -56,7 +56,7 @@ export interface LayoutProps extends WithChildren {}
 export default function Layout(props: LayoutProps): JSX.Element {
   return (
     <div className="flex min-h-screen fill-current">
-      <div className="flex-grow">
+      <div className="flex-grow max-w-full">
         <TopNav />
         <main>{props.children}</main>
       </div>
