@@ -42,7 +42,7 @@ function TopNav() {
               <Link href="/profile">Profile</Link>
             </li>
           </ul>
-          <TextInput className="mx-16" placeholder="Search meetups..." />
+          <TextInput className="mx-16" placeholder="Search events..." />
           {session && <LogoutButton />}
           {!session && <LoginButton />}
         </div>

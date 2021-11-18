@@ -6,6 +6,10 @@ import TextInput from "../components/atoms/TextInput";
 import Layout from "../components/layouts/Layout";
 import useSession from "../hooks/use-session";
 import { supabase } from "../utils/supabase.client";
+import useAuth from "../hooks/use-auth";
+import Container from "../components/atoms/Container";
+import useCreateWishlist from "../hooks/use-create-wishlist";
+import useGetWishlists from "../hooks/use-get-wishlists";
 
 interface Profile {
   username?: string;
@@ -24,8 +28,22 @@ function useProfile(): [Profile | null, typeof updateProfile, boolean] {
       const user = supabase.auth.user();
 
       const { data, error, status } = await supabase
-        .from("profiles")
-        .select(`username, website, avatar_url`)
+        .from("profile")
+        .select(
+          `
+          id,
+          username,
+          website,
+          avatar_url,
+          wishlist (
+            title,
+            wishlist_item (
+              title,
+              url
+            )
+          )
+        `
+        )
         .eq("id", user!.id)
         .single();
 
@@ -60,7 +78,7 @@ function useProfile(): [Profile | null, typeof updateProfile, boolean] {
         updated_at: new Date(),
       };
 
-      let { error } = await supabase.from("profiles").upsert(updates, {
+      let { error } = await supabase.from("profile").upsert(updates, {
         returning: "minimal", // Don't return the value after inserting
       });
 
@@ -96,18 +114,21 @@ function ProfileForm(props: ProfileFormProps): JSX.Element {
   });
 
   return (
-    <form onSubmit={handleSubmit(props.onSubmit)}>
-      <label>
+    <form className="flex flex-col" onSubmit={handleSubmit(props.onSubmit)}>
+      <label className="mb-8">
         Username
-        <TextInput {...register("username", { required: "Required" })} />
+        <TextInput
+          className="w-full"
+          {...register("username", { required: "Required" })}
+        />
       </label>
-      <label>
+      <label className="mb-8">
         Website
-        <TextInput {...register("website")} />
+        <TextInput className="w-full" {...register("website")} />
       </label>
-      <label>
+      <label className="mb-8">
         Avatar_url
-        <TextInput {...register("avatar_url")} />
+        <TextInput className="w-full" {...register("avatar_url")} />
       </label>
       <Button type="submit">Update Profile</Button>
     </form>
@@ -115,11 +136,14 @@ function ProfileForm(props: ProfileFormProps): JSX.Element {
 }
 
 export default function Profile() {
+  const user = useAuth();
   const [profile, updateProfile, loading] = useProfile();
+  const [createWishlist, wishlistLoading] = useCreateWishlist();
+  const [wishlists, wishlistsLoading] = useGetWishlists();
 
   const session = useSession();
 
-  if (!session?.user) {
+  if (!user) {
     return <div>Uh oh!</div>;
   }
 
@@ -129,8 +153,35 @@ export default function Profile() {
         <title>Profile</title>
       </Head>
       <Layout>
-        {profile && <ProfileForm profile={profile} onSubmit={updateProfile} />}
-        {!profile && <p>Loading...</p>}
+        <section className="mt-8">
+          <Container>
+            {profile && (
+              <ProfileForm profile={profile} onSubmit={updateProfile} />
+            )}
+            {!profile && <p>Loading...</p>}
+          </Container>
+        </section>
+        <section className="mt-8">
+          <Container>
+            <Button
+              className="mb-8"
+              onClick={() =>
+                createWishlist("My Good Wishlist", "This is my wishlist")
+              }
+            >
+              {wishlistLoading ? "Loading..." : "Create Wishlist"}
+            </Button>
+            {wishlistsLoading && <p>Loading...</p>}
+            <ul>
+              {wishlists.map((list) => (
+                <li key={list.id}>
+                  <h3 className="text-xl">{list.title}</h3>
+                  <p className="text-gray-600">{list.description}</p>
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </section>
       </Layout>
     </>
   );
