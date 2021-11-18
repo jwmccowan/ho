@@ -5,7 +5,7 @@ export default async function getEvents(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  let { error, data } = await supabase.from("events");
+  let { error, data } = await supabase.from("event");
 
   if (error) {
     return res.status(400).json({ error: error.message });

@@ -10,7 +10,7 @@ export default async function createEvent(
   if (!user) {
     throw new Error("Must be signed in!");
   }
-  let { error, data } = await supabase.from("events").insert({
+  let { error, data } = await supabase.from("event").insert({
     created_at: new Date(),
     event_date_time: date,
     title,
