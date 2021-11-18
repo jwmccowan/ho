@@ -78,18 +78,6 @@ export default function LoginPage(): JSX.Element {
                         required: "Required",
                       })}
                     />
-                    {errors.password && (
-                      <p className="text-red-600">{`* ${errors.password.message}`}</p>
-                    )}
-                    <TextInput
-                      className="mb-8"
-                      error={errors.email}
-                      type="password"
-                      placeholder="Password"
-                      {...register("password", {
-                        required: "Required",
-                      })}
-                    />
                     <Button
                       color={Button.color.default}
                       disabled={emailLoading}

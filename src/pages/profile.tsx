@@ -9,29 +9,21 @@ import { supabase } from "../utils/supabase.client";
 import useAuth from "../hooks/use-auth";
 import Container from "../components/atoms/Container";
 import useCreateWishlist from "../hooks/use-create-wishlist";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import Wishlist from "../api/interfaces/wishlist.interface";
 
 interface Profile {
+  id: string;
   username?: string;
   website?: string;
   avatar_url?: string;
 }
 
-function useProfile(): [Profile | null, typeof updateProfile, boolean] {
-  const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const session = useSession();
-
-  const getProfile = useCallback(async function () {
-    try {
-      setLoading(true);
-      const user = supabase.auth.user();
-
-      const { data, error, status } = await supabase
-        .from("profile")
-        .select(
-          `
+async function getProfile(id: string): Promise<Profile | null> {
+  const { data, error, status } = await supabase
+    .from("profile")
+    .select(
+      `
           id,
           username,
           website,
@@ -44,60 +36,25 @@ function useProfile(): [Profile | null, typeof updateProfile, boolean] {
             )
           )
         `
-        )
-        .eq("id", user!.id)
-        .single();
+    )
+    .eq("profile.id", id)
+    .single();
 
-      if (error && status !== 406) {
-        throw error;
-      }
+  if (error && status !== 406) {
+    throw error;
+  }
+  return data as Profile | null;
+}
 
-      if (data) {
-        setProfile(data);
-      } else {
-        setProfile({
-          username: "",
-          avatar_url: "",
-          website: "",
-        });
-      }
-    } catch (error) {
-      alert((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updateProfile = useCallback(async (profile: Profile) => {
-    try {
-      setLoading(true);
-      const user = supabase.auth.user();
-
-      const updates = {
-        id: user!.id,
-        ...profile,
-        updated_at: new Date(),
-      };
-
-      let { error } = await supabase.from("profile").upsert(updates, {
-        returning: "minimal", // Don't return the value after inserting
-      });
-
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      alert((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    getProfile();
-  }, [getProfile, session]);
-
-  return [profile, updateProfile, loading];
+async function updateProfile(profile: Profile): Promise<Profile> {
+  let { data, error } = await supabase.from("profile").upsert(profile);
+  if (error) {
+    throw error;
+  }
+  if (data && data.length > 0) {
+    return data[0];
+  }
+  return profile;
 }
 
 interface ProfileFormProps {
@@ -145,17 +102,29 @@ async function getWishlists() {
 }
 
 export default function Profile() {
-  const user = useAuth();
-  const [profile, updateProfile, loading] = useProfile();
+  const session = useAuth();
   const [createWishlist, wishlistLoading] = useCreateWishlist();
   const { data: wishlists, isValidating: wishlistsLoading } = useSWR(
     "all_wishlists",
     getWishlists
   );
+  const { data: profile, isValidating: profileLoading } = useSWR(
+    ["profile", session?.user?.id],
+    getProfile
+  );
+  const { mutate } = useSWRConfig();
+  async function submitHandler(prof: Profile) {
+    await mutate(["profile", session?.user?.id], () =>
+      updateProfile({
+        ...prof,
+        id: profile?.id as any,
+      })
+    );
+  }
 
   useAuth();
 
-  if (!user) {
+  if (!session?.user) {
     return <div>Uh oh!</div>;
   }
 
@@ -167,14 +136,20 @@ export default function Profile() {
       <Layout>
         <section className="mt-8">
           <Container>
-            {profile && (
-              <ProfileForm profile={profile} onSubmit={updateProfile} />
-            )}
-            {!profile && <p>Loading...</p>}
+            <h1 className="text-4xl">Profile</h1>
           </Container>
         </section>
         <section className="mt-8">
           <Container>
+            {profile && (
+              <ProfileForm profile={profile} onSubmit={submitHandler} />
+            )}
+            {!profile && profileLoading && <p>Loading...</p>}
+          </Container>
+        </section>
+        <section className="mt-8">
+          <Container>
+            <h2 className="text-2xl mb-8">Wishlists</h2>
             <Button
               className="mb-8"
               onClick={() =>
