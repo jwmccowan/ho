@@ -2,6 +2,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import useSWR from "swr";
 import HoEvent from "../../../api/interfaces/ho-event.interface";
+import useSession from "../../../hooks/use-session";
 import { supabase } from "../../../utils/supabase.client";
 import useScroll from "./useScroll";
 
@@ -17,9 +18,10 @@ export interface EventListProps {}
 
 export default function EventList(props: EventListProps): JSX.Element {
   const [ref, isLeftest, isRightest] = useScroll();
+  const session = useSession();
 
   const { data: events, isValidating: eventsLoading } = useSWR(
-    "get_events_home",
+    ["get_events_home", session?.user?.id],
     getEvents
   );
 

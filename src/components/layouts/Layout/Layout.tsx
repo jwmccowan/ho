@@ -10,7 +10,9 @@ import Logo from "../../icons/Logo";
 function LoginButton(): JSX.Element {
   return (
     <Link href="/login" passHref>
-      <Button>Login</Button>
+      <Button color={Button.color.primary} variant={Button.variant.contained}>
+        Login
+      </Button>
     </Link>
   );
 }
@@ -29,7 +31,7 @@ function TopNav() {
   return (
     <nav className="py-4">
       <Container>
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center justify-between">
           <ul className="flex flex-row items-center">
             <li>
               <Link href="/">
@@ -42,7 +44,6 @@ function TopNav() {
               <Link href="/profile">Profile</Link>
             </li>
           </ul>
-          <TextInput className="mx-16" placeholder="Search events..." />
           {session && <LogoutButton />}
           {!session && <LoginButton />}
         </div>
@@ -55,7 +56,7 @@ export interface LayoutProps extends WithChildren {}
 
 export default function Layout(props: LayoutProps): JSX.Element {
   return (
-    <div className="flex min-h-screen fill-current">
+    <div className="flex min-h-screen fill-current min-w-screen">
       <div className="flex-grow max-w-full">
         <TopNav />
         <main>{props.children}</main>

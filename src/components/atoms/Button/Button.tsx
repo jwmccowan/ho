@@ -17,18 +17,18 @@ enum ButtonColor {
 const colorVariantMap: Record<ButtonColor, Record<ButtonVariant, string>> = {
   [ButtonColor.default]: {
     [ButtonVariant.contained]: "",
-    [ButtonVariant.outlined]: "border-gray-600 text-gray-600",
+    [ButtonVariant.outlined]: "border border-gray-600 text-gray-600",
     [ButtonVariant.text]: "",
   },
   [ButtonColor.google]: {
-    [ButtonVariant.contained]: "",
-    [ButtonVariant.outlined]: "border-red-600 text-red-600",
+    [ButtonVariant.contained]: "bg-red-600 text-white",
+    [ButtonVariant.outlined]: "border border-red-600 text-red-600",
     [ButtonVariant.text]: "",
   },
   [ButtonColor.primary]: {
-    [ButtonVariant.contained]: "",
+    [ButtonVariant.contained]: "bg-green-600 text-white",
     [ButtonVariant.outlined]: "",
-    [ButtonVariant.text]: "border-green-600 text-green-600",
+    [ButtonVariant.text]: "border border-green-600 text-green-600",
   },
 };
 
@@ -50,7 +50,7 @@ export default function Button({
 }: ButtonProps): JSX.Element {
   const buttonClassName = clsx(
     className,
-    "px-4 py-2 rounded border",
+    "px-4 py-2 rounded-lg",
     colorVariantMap[color][variant]
   );
   return (

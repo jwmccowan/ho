@@ -8,10 +8,11 @@ import Layout from "../../components/layouts/Layout";
 import { supabase } from "../../utils/supabase.client";
 
 async function getEvent(id: string): Promise<HoEvent> {
+  console.log("eggs", id);
   const { data: event, error } = await supabase
     .from("event")
     .select()
-    .eq("event.id", id)
+    .eq("id", id)
     .single();
   if (error) {
     throw error;
