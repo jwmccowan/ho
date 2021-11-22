@@ -19,7 +19,7 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
       originalClassName,
       error && "border-red-400",
       !error && "border-gray-400",
-      "rounded border flex-grow px-4 py-2 rounded border "
+      "rounded border flex-grow px-4 py-2 rounded-lg border"
     );
     return <input {...rest} className={className} ref={ref} />;
   }

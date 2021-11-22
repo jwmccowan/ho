@@ -11,15 +11,10 @@ import Container from "../components/atoms/Container";
 import useCreateWishlist from "../hooks/use-create-wishlist";
 import useSWR, { useSWRConfig } from "swr";
 import Wishlist from "../api/interfaces/wishlist.interface";
+import HoProfile from "../api/interfaces/profile";
+import { ProfileAvatar } from "../components/molecules/ProfileAvatar";
 
-interface Profile {
-  id: string;
-  username?: string;
-  website?: string;
-  avatar_url?: string;
-}
-
-async function getProfile(id: string): Promise<Profile | null> {
+async function getProfile(id: string): Promise<HoProfile | null> {
   const { data, error, status } = await supabase
     .from("profile")
     .select(
@@ -43,10 +38,10 @@ async function getProfile(id: string): Promise<Profile | null> {
   if (error && status !== 406) {
     throw error;
   }
-  return data as Profile | null;
+  return data as HoProfile | null;
 }
 
-async function updateProfile(profile: Profile): Promise<Profile> {
+async function updateProfile(profile: HoProfile): Promise<HoProfile> {
   let { data, error } = await supabase.from("profile").upsert(profile);
   if (error) {
     throw error;
@@ -58,8 +53,9 @@ async function updateProfile(profile: Profile): Promise<Profile> {
 }
 
 interface ProfileFormProps {
-  profile: Profile;
-  onSubmit: (profile: Profile) => void;
+  profile: HoProfile;
+  onSubmit: (profile: HoProfile) => void;
+  onUpload: (url: string) => void;
 }
 
 function ProfileForm(props: ProfileFormProps): JSX.Element {
@@ -73,6 +69,12 @@ function ProfileForm(props: ProfileFormProps): JSX.Element {
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit(props.onSubmit)}>
+      <ProfileAvatar
+        name="profile-avatar"
+        profile={props.profile}
+        onUpload={props.onUpload}
+      />
+      <div className="h-6" />
       <label className="mb-8">
         Username
         <TextInput
@@ -83,10 +85,6 @@ function ProfileForm(props: ProfileFormProps): JSX.Element {
       <label className="mb-8">
         Website
         <TextInput className="w-full" {...register("website")} />
-      </label>
-      <label className="mb-8">
-        Avatar_url
-        <TextInput className="w-full" {...register("avatar_url")} />
       </label>
       <Button type="submit">Update Profile</Button>
     </form>
@@ -108,18 +106,21 @@ export default function Profile() {
     "all_wishlists",
     getWishlists
   );
-  const { data: profile, isValidating: profileLoading } = useSWR(
-    ["profile", session?.user?.id],
-    getProfile
-  );
-  const { mutate } = useSWRConfig();
-  async function submitHandler(prof: Profile) {
-    await mutate(["profile", session?.user?.id], () =>
+  const {
+    data: profile,
+    isValidating: profileLoading,
+    mutate,
+  } = useSWR(["profile", session?.user?.id], getProfile);
+  async function submitHandler(prof: HoProfile) {
+    await mutate(() =>
       updateProfile({
         ...prof,
         id: profile?.id as any,
       })
     );
+  }
+  async function uploadHandler(id: string, avatar_url: string) {
+    await mutate(() => updateProfile({ id, avatar_url }));
   }
 
   useAuth();
@@ -142,7 +143,11 @@ export default function Profile() {
         <section className="mt-8">
           <Container>
             {profile && (
-              <ProfileForm profile={profile} onSubmit={submitHandler} />
+              <ProfileForm
+                profile={profile}
+                onSubmit={submitHandler}
+                onUpload={(url) => uploadHandler(profile.id, url)}
+              />
             )}
             {!profile && profileLoading && <p>Loading...</p>}
           </Container>

@@ -9,7 +9,6 @@ import Button from "../components/atoms/Button";
 import Container from "../components/atoms/Container";
 import Layout from "../components/layouts/Layout";
 import EventList from "../components/molecules/EventList";
-import { supabase } from "../utils/supabase.client";
 
 const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
