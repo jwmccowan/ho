@@ -1,5 +1,5 @@
 import Image from "next/image";
-import HoProfile from "../../../api/interfaces/profile";
+import HoProfile from "../../../api/interfaces/ho-profile.interface";
 import { useGetImageSrc } from "../../../hooks/use-get-image-src";
 import { useUpload } from "../../../hooks/use-upload";
 import { Upload } from "../../atoms/Upload";
@@ -7,6 +7,7 @@ import { Upload } from "../../atoms/Upload";
 export interface ProfileAvatarProps {
   profile: HoProfile;
   name: string;
+  canUploadNew?: boolean;
   onUpload: (url: string) => void;
 }
 
@@ -15,14 +16,13 @@ export function ProfileAvatar(props: ProfileAvatarProps): JSX.Element {
   const [imageSrc, downloading] = useGetImageSrc(
     props.profile.avatar_url ?? ""
   );
-  console.log("eggs", imageSrc);
 
   return (
     <Upload
       name={props.name}
       accept="image/*"
       onChange={onImageSelected}
-      disabled={uploading || downloading}
+      disabled={uploading || downloading || !props.canUploadNew}
     >
       <div className="flex items-center justify-center">
         <Image

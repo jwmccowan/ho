@@ -1,16 +1,13 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
+import { Heading, Text } from "@chakra-ui/react";
 import { useState } from "react";
-import useSWR from "swr";
 import createEvent from "../api/create-event";
-import HoEvent from "../api/interfaces/ho-event.interface";
-import Button from "../components/atoms/Button";
-import Container from "../components/atoms/Container";
-import Layout from "../components/layouts/Layout";
+import { Button } from "@chakra-ui/react";
+import { Container } from "@chakra-ui/react";
 import EventList from "../components/molecules/EventList";
 
-const Home: NextPage = () => {
+export default function Home(): JSX.Element {
   const [loading, setLoading] = useState(false);
 
   const handleCreateClick = async () => {
@@ -33,27 +30,25 @@ const Home: NextPage = () => {
       <Head>
         <title>Ho</title>
       </Head>
-      <Layout>
-        <section className="py-8">
-          <Container>
-            <h1 className="text-4xl mb-4 text-gray-800">Welcome to Ho</h1>
-            <p className="text-xl text-gray-600">
-              Your first stop for all your Secret Santa needs!
-            </p>
-          </Container>
-        </section>
-        <section className="bg-red-300 py-12">
-          <Container>
-            <h2 className="text-2xl mb-8 text-red-900">Your upcoming events</h2>
-            <Button onClick={handleCreateClick}>
-              {loading ? "Loading..." : "Create Event"}
-            </Button>
-            <EventList />
-          </Container>
-        </section>
-      </Layout>
+      <section>
+        <Container maxW="container.md">
+          <Heading as="h1" size="2xl" mb={8}>
+            Welcome to Ho
+          </Heading>
+          <Text mb={4}>Your first stop for all your Secret Santa needs!</Text>
+        </Container>
+      </section>
+      <section>
+        <Container maxW="container.md">
+          <Heading as="h2" size="xl" mb={8}>
+            Your upcoming events
+          </Heading>
+          <Button onClick={handleCreateClick}>
+            {loading ? "Loading..." : "Create Event"}
+          </Button>
+          <EventList />
+        </Container>
+      </section>
     </>
   );
-};
-
-export default Home;
+}

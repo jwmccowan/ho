@@ -1,17 +1,15 @@
 import Head from "next/head";
-import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import Button from "../components/atoms/Button";
+import { Button } from "@chakra-ui/react";
 import TextInput from "../components/atoms/TextInput";
-import Layout from "../components/layouts/Layout";
 import useSession from "../hooks/use-session";
 import { supabase } from "../utils/supabase.client";
 import useAuth from "../hooks/use-auth";
-import Container from "../components/atoms/Container";
+import { Container } from "@chakra-ui/react";
 import useCreateWishlist from "../hooks/use-create-wishlist";
 import useSWR, { useSWRConfig } from "swr";
 import Wishlist from "../api/interfaces/wishlist.interface";
-import HoProfile from "../api/interfaces/profile";
+import HoProfile from "../api/interfaces/ho-profile.interface";
 import { ProfileAvatar } from "../components/molecules/ProfileAvatar";
 
 async function getProfile(id: string): Promise<HoProfile | null> {
@@ -21,7 +19,7 @@ async function getProfile(id: string): Promise<HoProfile | null> {
       `
           id,
           username,
-          website,
+          about,
           avatar_url,
           wishlist (
             title,
@@ -63,7 +61,7 @@ function ProfileForm(props: ProfileFormProps): JSX.Element {
     defaultValues: {
       username: props.profile.username,
       avatar_url: props.profile.avatar_url,
-      website: props.profile.website,
+      about: props.profile.about,
     },
   });
 
@@ -83,8 +81,8 @@ function ProfileForm(props: ProfileFormProps): JSX.Element {
         />
       </label>
       <label className="mb-8">
-        Website
-        <TextInput className="w-full" {...register("website")} />
+        About
+        <TextInput className="w-full" {...register("about")} />
       </label>
       <Button type="submit">Update Profile</Button>
     </form>
@@ -134,47 +132,45 @@ export default function Profile() {
       <Head>
         <title>Profile</title>
       </Head>
-      <Layout>
-        <section className="mt-8">
-          <Container>
-            <h1 className="text-4xl">Profile</h1>
-          </Container>
-        </section>
-        <section className="mt-8">
-          <Container>
-            {profile && (
-              <ProfileForm
-                profile={profile}
-                onSubmit={submitHandler}
-                onUpload={(url) => uploadHandler(profile.id, url)}
-              />
-            )}
-            {!profile && profileLoading && <p>Loading...</p>}
-          </Container>
-        </section>
-        <section className="mt-8">
-          <Container>
-            <h2 className="text-2xl mb-8">Wishlists</h2>
-            <Button
-              className="mb-8"
-              onClick={() =>
-                createWishlist("My Good Wishlist", "This is my wishlist")
-              }
-            >
-              {wishlistLoading ? "Loading..." : "Create Wishlist"}
-            </Button>
-            {wishlistsLoading && <p>Loading...</p>}
-            <ul>
-              {(wishlists ?? []).map((list) => (
-                <li key={list.id}>
-                  <h3 className="text-xl">{list.title}</h3>
-                  <p className="text-gray-600">{list.description}</p>
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </section>
-      </Layout>
+      <section className="mt-8">
+        <Container>
+          <h1 className="text-4xl">Profile</h1>
+        </Container>
+      </section>
+      <section className="mt-8">
+        <Container>
+          {profile && (
+            <ProfileForm
+              profile={profile}
+              onSubmit={submitHandler}
+              onUpload={(url) => uploadHandler(profile.id, url)}
+            />
+          )}
+          {!profile && profileLoading && <p>Loading...</p>}
+        </Container>
+      </section>
+      <section className="mt-8">
+        <Container>
+          <h2 className="text-2xl mb-8">Wishlists</h2>
+          <Button
+            className="mb-8"
+            onClick={() =>
+              createWishlist("My Good Wishlist", "This is my wishlist")
+            }
+          >
+            {wishlistLoading ? "Loading..." : "Create Wishlist"}
+          </Button>
+          {wishlistsLoading && <p>Loading...</p>}
+          <ul>
+            {(wishlists ?? []).map((list) => (
+              <li key={list.id}>
+                <h3 className="text-xl">{list.title}</h3>
+                <p className="text-gray-600">{list.description}</p>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
     </>
   );
 }

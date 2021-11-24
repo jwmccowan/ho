@@ -1,8 +1,13 @@
 import { supabase } from "../utils/supabase.client";
 import useSWR from "swr";
 import { useRouter } from "next/router";
+import { Session, User } from "@supabase/gotrue-js";
+import { useEffect } from "react";
 
-export default function useAuth(redirect = true) {
+export default function useAuth(redirect = true): {
+  session: Session | null;
+  user: User | null;
+} {
   const {
     data: session,
     error,
@@ -12,8 +17,8 @@ export default function useAuth(redirect = true) {
   if (error) {
     throw error;
   }
-  if (!isValidating && !session && redirect) {
+  if (!isValidating && !session?.user && redirect) {
     router.push("/login");
   }
-  return session ?? null;
+  return { session: session ?? null, user: session?.user ?? null };
 }

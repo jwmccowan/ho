@@ -1,6 +1,6 @@
 export default interface HoProfile {
   id: string;
   username?: string;
-  website?: string;
+  about?: string;
   avatar_url?: string;
 }

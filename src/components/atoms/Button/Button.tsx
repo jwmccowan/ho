@@ -50,7 +50,7 @@ export default function Button({
 }: ButtonProps): JSX.Element {
   const buttonClassName = clsx(
     className,
-    "px-4 py-2 rounded-lg",
+    "px-4 py-2 rounded-lg font-medium",
     colorVariantMap[color][variant]
   );
   return (
