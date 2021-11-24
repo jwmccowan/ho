@@ -3,7 +3,7 @@ import { uploadFile } from "../utils/file-utils/uploadFile";
 
 export function useUpload(
   bucket: string,
-  onUpload: (url: string) => void
+  onUpload?: (url: string) => void
 ): [boolean, React.ChangeEventHandler<HTMLInputElement>] {
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +20,7 @@ export function useUpload(
           throw new Error("You must select a file to upload.");
         }
         const url = await uploadFile(ev.target.files[0], bucket);
-        onUploadRef.current(url);
+        onUploadRef.current?.(url);
       } catch (error: any) {
         alert(error.message);
       } finally {

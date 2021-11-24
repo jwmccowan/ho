@@ -1,1 +1,2 @@
-export * from "./ProfileAvatar";
+export * from "./ProfileAvatarWithUpload";
+export { default } from "./ProfileAvatar";

@@ -10,7 +10,7 @@ export interface UploadProps {
 
 export const Upload = forwardRef<HTMLInputElement, UploadProps>(
   (props, ref) => (
-    <label htmlFor={props.name}>
+    <label htmlFor={props.name} style={{ cursor: "pointer" }}>
       <input
         type="file"
         disabled={props.disabled}
